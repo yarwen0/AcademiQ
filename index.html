@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      A05 Security Misconfiguration (OWASP):
+      Content-Security-Policy blocks XSS by whitelisting trusted sources only.
+      - No 'unsafe-inline' or 'unsafe-eval' in script-src — prevents injected JS execution.
+      - style-src 'unsafe-inline' is required for Tailwind's runtime style injection in dev;
+        in production, replace with a nonce or hash when using a style bundler.
+      - frame-ancestors 'none' replaces the deprecated X-Frame-Options header for clickjacking.
+      - connect-src restricts fetch/XHR to same-origin and the known API origin.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' http://localhost:8080; frame-ancestors 'none';"
+    />
+
+    <!--
+      X-Frame-Options as a belt-and-suspenders measure for older browsers
+      that may not support the frame-ancestors CSP directive.
+    -->
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <title>AcademiQ — Secure Academic Forum</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
