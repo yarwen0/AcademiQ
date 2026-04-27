@@ -17,7 +17,7 @@ A modern discussion and thread management platform with a Go backend API and Rea
 cd backend
 
 # Copy environment file and set JWT_SECRET
-cp ../.env .env
+cp .env.example .env
 # Edit .env and change JWT_SECRET to a secure value
 
 # Download dependencies
