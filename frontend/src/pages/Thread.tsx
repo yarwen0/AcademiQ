@@ -119,22 +119,20 @@ export function ThreadPage() {
         {/* Actions */}
         <div className="mt-4 flex flex-wrap items-center gap-4">
           {/* Vote */}
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3 text-xs">
             <button
               onClick={() => voteThread(1)}
-              className="flex items-center gap-1 border-2 border-[var(--line)] bg-[rgba(248,241,220,0.78)] px-3 py-1.5 text-sm
-                         text-[var(--ink-soft)] transition-colors hover:text-[var(--accent)]"
+              className="flex items-center gap-1 text-[var(--ink-soft)] transition-colors hover:text-[var(--accent)]"
               aria-label="Upvote"
             >
               Upvote {thread.upvotes}
             </button>
             <button
               onClick={() => voteThread(-1)}
-              className="flex items-center gap-1 border-2 border-[var(--line)] bg-[rgba(248,241,220,0.78)] px-3 py-1.5 text-sm
-                         text-[var(--ink-soft)] transition-colors hover:text-[var(--danger)]"
+              className="flex items-center gap-1 text-[var(--ink-soft)] transition-colors hover:text-[var(--danger)]"
               aria-label="Downvote"
             >
-              Downvote
+              Downvote {thread.downvotes}
             </button>
           </div>
 

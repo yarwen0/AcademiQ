@@ -55,6 +55,7 @@ export interface Thread {
   category: string;
   tags: string[];
   upvotes: number;
+  downvotes: number;
   commentCount: number;
   flair: ThreadFlair;
   isLocked: boolean;

@@ -59,7 +59,7 @@ function CommentNode({
         {comment.authorName[0]?.toUpperCase() ?? '?'}
       </div>
 
-      <div className="flex-1 min-w-0">
+      <div className="retro-panel-muted flex-1 min-w-0 p-3">
         {/* Header */}
         <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--ink-soft)]">
           <span className="font-semibold text-[var(--line)]">{comment.authorName}</span>

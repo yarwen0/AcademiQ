@@ -49,8 +49,8 @@ export const threadsService = {
     return data;
   },
 
-  async vote(id: string, value: 1 | -1 | 0): Promise<{ upvotes: number }> {
-    const { data } = await apiClient.post<{ upvotes: number }>(
+  async vote(id: string, value: 1 | -1 | 0): Promise<{ upvotes: number; downvotes: number }> {
+    const { data } = await apiClient.post<{ upvotes: number; downvotes: number }>(
       `/api/threads/${id}/vote`,
       { value },
     );

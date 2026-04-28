@@ -17,11 +17,15 @@ export function ThreadCard({ thread }: ThreadCardProps) {
     <article className="retro-card group p-4 transition-transform hover:-translate-y-0.5">
       <div className="flex gap-4">
         {/* Vote count */}
-        <div className="retro-panel-muted flex min-w-[54px] flex-col items-center gap-0.5 self-start px-2 py-2">
+        <div className="retro-panel-muted flex min-w-[72px] flex-col items-center gap-1 self-start px-2 py-2">
           <span className="text-lg font-bold leading-none text-[var(--line)]">
             {thread.upvotes}
           </span>
-          <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--ink-soft)]">votes</span>
+          <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--ink-soft)]">upvotes</span>
+          <span className="mt-1 text-base font-bold leading-none text-[var(--danger)]">
+            {thread.downvotes}
+          </span>
+          <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--ink-soft)]">downvotes</span>
         </div>
 
         {/* Content */}

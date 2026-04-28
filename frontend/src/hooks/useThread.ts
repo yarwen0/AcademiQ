@@ -54,8 +54,8 @@ export function useThread(threadId: string): UseThreadReturn {
 
   const voteThread = useCallback(
     async (value: 1 | -1 | 0) => {
-      const { upvotes } = await threadsService.vote(threadId, value);
-      setThread((prev) => (prev ? { ...prev, upvotes } : prev));
+      const { upvotes, downvotes } = await threadsService.vote(threadId, value);
+      setThread((prev) => (prev ? { ...prev, upvotes, downvotes } : prev));
     },
     [threadId],
   );

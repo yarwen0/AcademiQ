@@ -50,7 +50,7 @@ export function ReplyBox({ threadId, parentId, onPosted }: ReplyBoxProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="retro-card space-y-3 p-4">
       <div className="relative">
         <textarea
           value={isLoadingDraft ? '' : content}
@@ -58,22 +58,21 @@ export function ReplyBox({ threadId, parentId, onPosted }: ReplyBoxProps) {
           placeholder="Write a reply..."
           rows={3}
           disabled={isLoadingDraft}
-          className="w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm
-                     text-slate-800 placeholder-slate-400 focus:border-indigo-500
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500
-                     disabled:bg-slate-50 disabled:text-slate-400"
+          className="min-h-28 w-full resize-y border-2 border-[var(--line)] bg-[rgba(255,252,242,0.92)] px-3 py-2.5 text-sm
+                     text-[var(--ink)] placeholder:text-[rgba(109,90,68,0.75)]
+                     focus:outline-none disabled:bg-[rgba(240,227,194,0.6)] disabled:text-[rgba(109,90,68,0.75)]"
           aria-label="Reply text"
         />
         {/* Draft saved indicator */}
         {draftSaved && (
-          <span className="absolute bottom-2 right-2 text-xs text-slate-400">
+          <span className="absolute bottom-2 right-2 bg-[rgba(248,241,220,0.96)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ink-soft)]">
             Draft saved
           </span>
         )}
       </div>
 
       {error && (
-        <p role="alert" className="text-xs text-red-600">
+        <p role="alert" className="text-xs text-[var(--danger)]">
           {error}
         </p>
       )}
