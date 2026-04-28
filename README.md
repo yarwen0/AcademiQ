@@ -24,8 +24,9 @@ This starts:
 - `postgres` inside the Compose network for the backend
 
 **Demo Credentials:**
-- Student: `student@academiq.local` / `StudentPass123!`
-- Admin: `admin@academiq.local` / `AdminPass123!`
+Admin: admin@usm.edu / Password123!
+
+Student: student@usm.edu / Password123!
 
 To stop the stack:
 
