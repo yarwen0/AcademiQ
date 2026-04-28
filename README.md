@@ -1,57 +1,35 @@
 # AcademiQ
 
-A modern discussion and thread management platform with a Go backend API and React TypeScript frontend. The backend persists application data in PostgreSQL, while the frontend stores unsent post/comment drafts in a browser-local SQLite database powered by `sql.js`.
+A modern discussion and thread management platform with a Go backend API and React TypeScript frontend. Features secure authentication with JWT, role-based access control, community discussions, and admin controls.
 
 ## Prerequisites
 
 - **Node.js** 18+ and npm
 - **Go** 1.23+
 - **PostgreSQL** 12+ (for database)
-- **Docker Compose** (optional, recommended for one-command startup)
 - **Git** for version control
 
 ## Quick Start (Full Stack)
-
-### Docker Compose
-
-```bash
-docker compose up --build
-```
-
-This starts:
-- `frontend` on `http://localhost:5174`
-- `backend` inside the Compose network behind the frontend proxy
-- `postgres` inside the Compose network for the backend
-
-**Demo Credentials:**
-- Student: `student@academiq.local` / `StudentPass123!`
-- Admin: `admin@academiq.local` / `AdminPass123!`
-
-To stop the stack:
-
-```bash
-docker compose down
-```
-
-To remove the database volume too:
-
-```bash
-docker compose down -v
-```
 
 ### 1. Backend Setup
 
 ```bash
 cd backend
 
-# Set backend environment
-export DATABASE_URL=postgres://postgres:postgres@localhost:5432/academiq?sslmode=disable
-export JWT_SECRET=change-me
-export FRONTEND_ORIGIN=http://localhost:5173
+# Copy environment file and set JWT_SECRET
+cp .env.example .env
+# Edit .env and change JWT_SECRET to a secure value
 
-# Start server (runs on :8080 and applies schema automatically)
+# Download dependencies
+go mod tidy
+
+# Run migrations and start server (runs on :8080)
 go run ./cmd/api
 ```
+
+**Demo Credentials:**
+- Student: `student@academiq.local` / `StudentPass123!`
+- Admin: `admin@academiq.local` / `AdminPass123!`
 
 ### 2. Frontend Setup
 
@@ -104,19 +82,6 @@ go build -o academiq-api ./cmd/api
 
 # Run migrations (if not automatic on startup)
 # Managed by the app on initialization
-```
-
-### Docker
-
-```bash
-# Build and start all services
-docker compose up --build
-
-# Rebuild one service
-docker compose build backend
-
-# Stop the stack
-docker compose down
 ```
 
 ### Build Configuration
@@ -173,7 +138,9 @@ AcademiQ/
 │   │   │   └── login_guard.go      # Brute-force lockout
 │   │   └── store/           # Database operations
 │   ├── migrations/
-│   │   └── 001_init.sql     # Database schema
+│   │   ├── 001_extensions_and_users.sql
+│   │   ├── 002_forum_core.sql
+│   │   └── 003_indexes.sql  # Schema + indexing
 │   ├── .env                 # Environment variables
 │   ├── go.mod               # Module definition
 │   └── go.sum               # Dependency checksums
@@ -246,7 +213,7 @@ AcademiQ/
 - **Comments**: Reply to threads with nested comment support
 - **User Profiles**: View user information and contribution history
 - **Admin Dashboard**: Moderation and system management tools
-- **Draft Management**: Automatic draft saving to browser-local SQLite
+- **Draft Management**: Automatic draft saving to LocalStorage
 
 #### Security
 - **Content Sanitization**: DOMPurify protects against XSS attacks
@@ -284,3 +251,19 @@ VITE_API_BASE_URL=http://localhost:8080
 -  Input validation and error handling
 
 ---
+
+## Work Distribution (Implemented)
+
+### Kshitiz Neupane — Database Architect
+
+Delivered PostgreSQL implementation for the backend:
+
+- Designed and split SQL migrations into versioned files:
+  - `backend/migrations/001_extensions_and_users.sql`
+  - `backend/migrations/002_forum_core.sql`
+  - `backend/migrations/003_indexes.sql`
+- Implemented migration runner with `schema_migrations` tracking for idempotent startup migration application.
+- Replaced in-memory auth lookup path with PostgreSQL-backed user store using parameterized SQL (`$1`) to prevent SQL injection.
+- Added query sanitization and normalization at the store boundary (`NormalizeEmail`) before database lookup.
+- Added practical indexing strategy for auth lookups, feed queries, tag/comment traversal, and text search.
+- Wired backend startup to open PostgreSQL, apply migrations, and seed demo users safely.
