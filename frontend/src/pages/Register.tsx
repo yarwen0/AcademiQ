@@ -41,11 +41,11 @@ interface FormErrors {
 }
 
 const strengthColors = [
-  'bg-slate-200',
-  'bg-red-500',
-  'bg-orange-400',
-  'bg-yellow-400',
-  'bg-green-500',
+  'bg-[rgba(59,44,27,0.14)]',
+  'bg-[var(--danger)]',
+  'bg-[var(--accent)]',
+  'bg-[var(--gold)]',
+  'bg-[var(--olive)]',
 ];
 
 const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
@@ -109,15 +109,15 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm">
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="retro-card p-8">
           <div className="mb-6 text-center">
-            <span className="text-4xl">📚</span>
-            <h1 className="mt-2 text-2xl font-bold text-slate-800">
+            <p className="retro-kicker">Enrollment Desk</p>
+            <h1 className="retro-title mt-3 text-3xl">
               Create account
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-[var(--ink-soft)]">
               Join your university's academic forum
             </p>
           </div>
@@ -125,7 +125,7 @@ export function RegisterPage() {
           {serverError && (
             <div
               role="alert"
-              className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              className="mb-4 border-2 border-[var(--danger)] bg-[#fbebe6] p-3 text-sm text-[var(--danger)]"
             >
               {serverError}
             </div>
@@ -188,7 +188,7 @@ export function RegisterPage() {
                         className={`h-1 flex-1 rounded-full transition-colors duration-200 ${
                           level <= strengthScore
                             ? strengthColors[strengthScore]
-                            : 'bg-slate-200'
+                            : 'bg-[rgba(59,44,27,0.14)]'
                         }`}
                       />
                     ))}
@@ -196,10 +196,10 @@ export function RegisterPage() {
                   <p
                     className={`text-xs font-medium ${
                       strengthScore >= 4
-                        ? 'text-green-600'
+                        ? 'text-[var(--olive)]'
                         : strengthScore >= 3
-                          ? 'text-yellow-600'
-                          : 'text-red-600'
+                          ? 'text-[var(--gold)]'
+                          : 'text-[var(--danger)]'
                     }`}
                   >
                     {strengthLabels[strengthScore]}
@@ -228,11 +228,11 @@ export function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-slate-500">
+          <p className="mt-4 text-center text-sm text-[var(--ink-soft)]">
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-medium text-indigo-600 hover:underline"
+              className="font-semibold uppercase tracking-[0.12em] text-[var(--accent)] hover:underline"
             >
               Sign in
             </Link>

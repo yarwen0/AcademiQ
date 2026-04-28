@@ -75,17 +75,18 @@ export function HomePage() {
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="retro-shell mb-6 flex flex-col gap-4 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Forum</h1>
-          <p className="text-sm text-slate-500">{total} threads</p>
+          <p className="retro-kicker">Public Bulletin</p>
+          <h1 className="retro-title text-3xl">Forum</h1>
+          <p className="mt-1 text-sm text-[var(--ink-soft)]">{total} threads in circulation</p>
         </div>
         {/* A01: "New Post" only shown to authenticated users — backend enforces creation auth */}
         {isAuthenticated && (
           <Link to="/thread/new">
-            <Button>+ New Post</Button>
+            <Button>New Post</Button>
           </Link>
         )}
       </div>
@@ -94,32 +95,31 @@ export function HomePage() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row">
         {/* Search */}
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-            🔍
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">
+            Find
           </span>
           <input
             type="search"
-            placeholder="Search threads..."
+            placeholder="Search threads, topics, and tags"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm
-                       text-slate-800 placeholder-slate-400 focus:border-indigo-500
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full border-2 border-[var(--line)] bg-[rgba(255,252,242,0.72)] py-2.5 pl-16 pr-3 text-sm
+                       text-[var(--ink)] placeholder:text-[rgba(109,90,68,0.75)] focus:outline-none"
             aria-label="Search threads"
           />
         </div>
 
         {/* Sort tabs */}
-        <div className="flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+        <div className="flex border-2 border-[var(--line)] bg-[rgba(248,241,220,0.8)] p-1">
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setSort(opt.value)}
               className={[
-                'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                'px-3 py-1.5 text-sm font-semibold uppercase tracking-[0.14em] transition-colors',
                 sort === opt.value
-                  ? 'bg-white text-indigo-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800',
+                  ? 'bg-[var(--accent)] text-[var(--panel)]'
+                  : 'text-[var(--ink-soft)] hover:text-[var(--line)]',
               ].join(' ')}
             >
               {opt.label}
@@ -134,17 +134,17 @@ export function HomePage() {
           {Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className="h-20 animate-pulse rounded-xl bg-slate-200"
+              className="h-24 animate-pulse border-2 border-[var(--line)] bg-[rgba(240,227,194,0.7)]"
             />
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
+        <div className="border-2 border-[var(--danger)] bg-[#fbebe6] p-6 text-center text-sm text-[var(--danger)]">
           {error}
         </div>
       ) : threads.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
-          <p className="text-slate-400">
+        <div className="retro-card p-12 text-center">
+          <p className="text-[var(--ink-soft)]">
             {debouncedSearch
               ? 'No threads match your search.'
               : 'No threads yet. Be the first to post!'}
@@ -172,9 +172,9 @@ export function HomePage() {
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
           >
-            ← Previous
+            Previous
           </Button>
-          <span className="flex items-center px-3 text-sm text-slate-600">
+          <span className="flex items-center px-3 text-sm uppercase tracking-[0.12em] text-[var(--ink-soft)]">
             Page {page} of {totalPages}
           </span>
           <Button
@@ -183,7 +183,7 @@ export function HomePage() {
             disabled={page >= totalPages}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next →
+            Next
           </Button>
         </div>
       )}

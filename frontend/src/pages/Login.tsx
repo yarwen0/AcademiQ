@@ -76,16 +76,16 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm">
         {/* Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <div className="retro-card p-8">
           <div className="mb-6 text-center">
-            <span className="text-4xl">📚</span>
-            <h1 className="mt-2 text-2xl font-bold text-slate-800">
+            <p className="retro-kicker">Member Access</p>
+            <h1 className="retro-title mt-3 text-3xl">
               Welcome back
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-[var(--ink-soft)]">
               Sign in to your AcademiQ account
             </p>
           </div>
@@ -94,7 +94,7 @@ export function LoginPage() {
           {isLockedOut && (
             <div
               role="alert"
-              className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              className="mb-4 border-2 border-[var(--danger)] bg-[#fbebe6] p-3 text-sm text-[var(--danger)]"
             >
               <strong>Account locked.</strong> Too many failed attempts.
               Please wait before trying again.
@@ -105,7 +105,7 @@ export function LoginPage() {
           {serverError && !isLockedOut && (
             <div
               role="alert"
-              className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+              className="mb-4 border-2 border-[var(--danger)] bg-[#fbebe6] p-3 text-sm text-[var(--danger)]"
             >
               {serverError}
             </div>
@@ -150,7 +150,7 @@ export function LoginPage() {
             Don&apos;t have an account?{' '}
             <Link
               to="/register"
-              className="font-medium text-indigo-600 hover:underline"
+              className="font-semibold uppercase tracking-[0.12em] text-[var(--accent)] hover:underline"
             >
               Sign up
             </Link>

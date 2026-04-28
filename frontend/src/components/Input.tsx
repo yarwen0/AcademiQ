@@ -15,7 +15,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-slate-700"
+            className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink-soft)]"
           >
             {label}
           </label>
@@ -24,12 +24,11 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={[
-            'w-full rounded-lg border px-3 py-2 text-sm text-slate-800 placeholder-slate-400',
-            'transition-colors duration-150',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500',
+            'w-full rounded-none border-2 px-3 py-2.5 text-sm text-[var(--ink)] placeholder:text-[rgba(109,90,68,0.75)]',
+            'transition-colors duration-150 focus:outline-none',
             error
-              ? 'border-red-400 bg-red-50 focus:ring-red-400 focus:border-red-400'
-              : 'border-slate-300 bg-white hover:border-slate-400',
+              ? 'border-[var(--danger)] bg-[#fbebe6]'
+              : 'border-[var(--line)] bg-[rgba(255,252,242,0.72)] hover:bg-[rgba(255,252,242,0.96)]',
             className,
           ].join(' ')}
           aria-describedby={
@@ -39,12 +38,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p id={`${inputId}-error`} role="alert" className="text-xs text-red-600">
+          <p id={`${inputId}-error`} role="alert" className="text-xs text-[var(--danger)]">
             {error}
           </p>
         )}
         {!error && hint && (
-          <p id={`${inputId}-hint`} className="text-xs text-slate-500">
+          <p id={`${inputId}-hint`} className="text-xs text-[var(--ink-soft)]">
             {hint}
           </p>
         )}

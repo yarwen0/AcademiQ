@@ -73,7 +73,7 @@ export function ProfilePage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
-        <span className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+        <span className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
       </div>
     );
   }
@@ -89,33 +89,33 @@ export function ProfilePage() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 space-y-8">
       {/* Profile card */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="retro-card p-6">
         <div className="flex items-start gap-4">
           {/* Avatar */}
-          <div className="h-16 w-16 flex-shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-2xl font-bold text-indigo-600">
+          <div className="retro-avatar flex h-16 w-16 flex-shrink-0 items-center justify-center text-2xl font-bold">
             {profile.displayName[0]?.toUpperCase() ?? '?'}
           </div>
 
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-bold text-slate-800">
+              <h1 className="font-serif text-2xl font-bold text-[var(--line)]">
                 {profile.displayName}
               </h1>
               <RoleBadge role={profile.role} />
               {profile.isBanned && (
-                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">
+                <span className="border-2 border-[var(--line)] bg-[#e0b4a8] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#6b2317]">
                   Banned
                 </span>
               )}
             </div>
-            <p className="mt-0.5 text-sm text-slate-500">{profile.email}</p>
-            <p className="text-sm text-slate-500">{profile.university}</p>
+            <p className="mt-0.5 text-sm text-[var(--ink-soft)]">{profile.email}</p>
+            <p className="text-sm text-[var(--ink-soft)]">{profile.university}</p>
           </div>
         </div>
 
         {/* Edit display name (own profile only) */}
         {isOwnProfile && (
-          <div className="mt-5 border-t border-slate-100 pt-5">
+          <div className="retro-rule mt-5 pt-5">
             {editingName ? (
               <div className="flex flex-col gap-3">
                 <Input
@@ -154,7 +154,7 @@ export function ProfilePage() {
       <section>
         <h2 className="mb-4 text-lg font-semibold text-slate-700">Posts</h2>
         {threads.length === 0 ? (
-          <p className="text-sm text-slate-400">No posts yet.</p>
+          <p className="text-sm text-[var(--ink-soft)]">No posts yet.</p>
         ) : (
           <div className="space-y-3">
             {threads.map((t) => (

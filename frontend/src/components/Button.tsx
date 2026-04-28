@@ -12,13 +12,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    'bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 disabled:bg-indigo-300',
+    'border-2 border-[var(--line)] bg-[var(--accent)] text-[var(--panel)] shadow-[3px_3px_0_rgba(59,44,27,0.18)] hover:bg-[var(--accent-strong)] disabled:bg-[color:color-mix(in_srgb,var(--accent)_55%,white)]',
   secondary:
-    'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus-visible:ring-slate-400 disabled:opacity-50',
+    'border-2 border-[var(--line)] bg-[var(--panel)] text-[var(--ink)] shadow-[3px_3px_0_rgba(59,44,27,0.12)] hover:bg-[var(--paper-strong)] disabled:opacity-50',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 disabled:bg-red-300',
+    'border-2 border-[var(--line)] bg-[var(--danger)] text-[var(--panel)] shadow-[3px_3px_0_rgba(59,44,27,0.18)] hover:bg-[#6f2519] disabled:bg-[color:color-mix(in_srgb,var(--danger)_55%,white)]',
   ghost:
-    'bg-transparent text-slate-600 hover:bg-slate-100 focus-visible:ring-slate-400 disabled:opacity-50',
+    'border-2 border-transparent bg-transparent text-[var(--ink-soft)] hover:border-[rgba(59,44,27,0.28)] hover:bg-[rgba(248,241,220,0.5)] disabled:opacity-50',
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -41,8 +41,9 @@ export function Button({
     <button
       disabled={disabled || isLoading}
       className={[
-        'inline-flex items-center justify-center gap-2 rounded-lg font-medium',
-        'transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2',
+        'inline-flex items-center justify-center gap-2 rounded-none font-semibold uppercase tracking-[0.16em]',
+        'transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2',
+        'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
         'disabled:cursor-not-allowed',
         variantClasses[variant],
         sizeClasses[size],

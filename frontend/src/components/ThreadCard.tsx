@@ -7,21 +7,21 @@ interface ThreadCardProps {
 }
 
 const flairConfig = {
-  answered: { label: 'Answered', className: 'bg-green-100 text-green-700' },
-  locked: { label: 'Locked', className: 'bg-slate-100 text-slate-600' },
-  pinned: { label: 'Pinned', className: 'bg-indigo-100 text-indigo-700' },
+  answered: { label: 'Answered', className: 'border border-[var(--line)] bg-[#d7e0bd] text-[#38411a]' },
+  locked: { label: 'Locked', className: 'border border-[var(--line)] bg-[#e4d4b1] text-[var(--ink-soft)]' },
+  pinned: { label: 'Pinned', className: 'border border-[var(--line)] bg-[#cbbda0] text-[var(--line)]' },
 };
 
 export function ThreadCard({ thread }: ThreadCardProps) {
   return (
-    <article className="group rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <article className="retro-card group p-4 transition-transform hover:-translate-y-0.5">
       <div className="flex gap-4">
         {/* Vote count */}
-        <div className="flex flex-col items-center gap-0.5 pt-1 min-w-[40px]">
-          <span className="text-lg font-bold text-slate-700 leading-none">
+        <div className="retro-panel-muted flex min-w-[54px] flex-col items-center gap-0.5 self-start px-2 py-2">
+          <span className="text-lg font-bold leading-none text-[var(--line)]">
             {thread.upvotes}
           </span>
-          <span className="text-xs text-slate-400">votes</span>
+          <span className="text-[10px] uppercase tracking-[0.12em] text-[var(--ink-soft)]">votes</span>
         </div>
 
         {/* Content */}
@@ -29,19 +29,19 @@ export function ThreadCard({ thread }: ThreadCardProps) {
           {/* Title */}
           <Link
             to={`/thread/${thread.id}`}
-            className="text-base font-semibold text-slate-800 hover:text-indigo-600 transition-colors line-clamp-2 group-hover:text-indigo-600"
+            className="font-serif text-lg font-bold text-[var(--line)] transition-colors line-clamp-2 group-hover:text-[var(--accent)]"
           >
             {/* React renders text content safely — no sanitization needed for plain text */}
             {thread.title}
           </Link>
 
           {/* Meta row */}
-          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[var(--ink-soft)]">
             <span>
               by{' '}
               <Link
                 to={`/profile/${thread.authorId}`}
-                className="font-medium text-slate-700 hover:text-indigo-600"
+                className="font-semibold text-[var(--line)] hover:text-[var(--accent)]"
               >
                 {thread.authorName}
               </Link>
@@ -52,14 +52,14 @@ export function ThreadCard({ thread }: ThreadCardProps) {
             <span>{thread.commentCount} comments</span>
 
             {/* Category */}
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+            <span className="border border-[var(--line)] bg-[rgba(240,227,194,0.78)] px-2 py-0.5 font-semibold uppercase tracking-[0.12em] text-[var(--ink-soft)]">
               {thread.category}
             </span>
 
             {/* Flair */}
             {thread.flair && flairConfig[thread.flair] && (
               <span
-                className={`rounded-full px-2 py-0.5 font-medium ${flairConfig[thread.flair].className}`}
+                className={`px-2 py-0.5 font-semibold uppercase tracking-[0.12em] ${flairConfig[thread.flair].className}`}
               >
                 {flairConfig[thread.flair].label}
               </span>
@@ -69,7 +69,7 @@ export function ThreadCard({ thread }: ThreadCardProps) {
             {thread.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full bg-indigo-50 px-2 py-0.5 text-indigo-600 font-medium"
+                className="border border-[var(--accent)] bg-[rgba(139,46,26,0.08)] px-2 py-0.5 font-semibold text-[var(--accent)]"
               >
                 #{tag}
               </span>

@@ -6,15 +6,15 @@ const roleConfig: Record<
 > = {
   student: {
     label: 'Student',
-    className: 'bg-blue-100 text-blue-700 border border-blue-200',
+    className: 'border-2 border-[var(--line)] bg-[#d7e0bd] text-[#38411a]',
   },
   moderator: {
     label: 'Moderator',
-    className: 'bg-amber-100 text-amber-700 border border-amber-200',
+    className: 'border-2 border-[var(--line)] bg-[#ead7ac] text-[#6f5316]',
   },
   admin: {
     label: 'Admin',
-    className: 'bg-red-100 text-red-700 border border-red-200',
+    className: 'border-2 border-[var(--line)] bg-[#e0b4a8] text-[#6b2317]',
   },
 };
 
@@ -22,7 +22,7 @@ export function RoleBadge({ role }: { role: Role }) {
   const { label, className } = roleConfig[role];
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] ${className}`}
     >
       {label}
     </span>
