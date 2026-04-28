@@ -146,7 +146,7 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-slate-500">
+          <p className="mt-4 text-center text-sm text-[var(--ink-soft)]">
             Don&apos;t have an account?{' '}
             <Link
               to="/register"

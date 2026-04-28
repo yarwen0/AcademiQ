@@ -46,7 +46,7 @@ export function ThreadPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <span className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent inline-block" />
+        <span className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
       </div>
     );
   }
@@ -77,33 +77,33 @@ export function ThreadPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 space-y-8">
       {/* Thread header */}
-      <article>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mb-2">
-          <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
+      <article className="retro-card p-6">
+        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-[var(--ink-soft)]">
+          <span className="border border-[var(--line)] bg-[rgba(240,227,194,0.78)] px-2 py-0.5 font-semibold uppercase tracking-[0.12em] text-[var(--ink-soft)]">
             {thread.category}
           </span>
           {thread.flair === 'answered' && (
-            <span className="rounded-full bg-green-100 px-2 py-0.5 font-medium text-green-700">
-              ✓ Answered
+            <span className="border border-[var(--line)] bg-[#d7e0bd] px-2 py-0.5 font-semibold uppercase tracking-[0.12em] text-[#38411a]">
+              Answered
             </span>
           )}
           {thread.isLocked && (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 font-medium text-slate-600">
-              🔒 Locked
+            <span className="border border-[var(--line)] bg-[#e4d4b1] px-2 py-0.5 font-semibold uppercase tracking-[0.12em] text-[var(--ink-soft)]">
+              Locked
             </span>
           )}
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-800 mb-3">{thread.title}</h1>
+        <h1 className="mb-3 font-serif text-3xl font-bold text-[var(--line)]">{thread.title}</h1>
 
-        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 mb-4">
+        <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-[var(--ink-soft)]">
           <span>
-            by <span className="font-semibold text-slate-700">{thread.authorName}</span>
+            by <span className="font-semibold text-[var(--line)]">{thread.authorName}</span>
           </span>
           <span>·</span>
           <span>{formatDate(thread.createdAt)}</span>
           {thread.tags.map((tag) => (
-            <span key={tag} className="rounded-full bg-indigo-50 px-2 py-0.5 text-indigo-600 font-medium">
+            <span key={tag} className="border border-[var(--accent)] bg-[rgba(139,46,26,0.08)] px-2 py-0.5 font-semibold text-[var(--accent)]">
               #{tag}
             </span>
           ))}
@@ -111,7 +111,7 @@ export function ThreadPage() {
 
         {/* Thread body — A03 XSS: sanitized before DOM insertion */}
         <div
-          className="prose prose-slate max-w-none rounded-xl border border-slate-100 bg-white p-5"
+          className="retro-prose max-w-none border-2 border-[rgba(59,44,27,0.2)] bg-[rgba(255,252,242,0.62)] p-5"
           // A03 XSS: ALL user-generated content passes through DOMPurify before render.
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(thread.content) }}
         />
@@ -122,26 +122,26 @@ export function ThreadPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => voteThread(1)}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm
-                         text-slate-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors"
+              className="flex items-center gap-1 border-2 border-[var(--line)] bg-[rgba(248,241,220,0.78)] px-3 py-1.5 text-sm
+                         text-[var(--ink-soft)] transition-colors hover:text-[var(--accent)]"
               aria-label="Upvote"
             >
-              ▲ {thread.upvotes}
+              Upvote {thread.upvotes}
             </button>
             <button
               onClick={() => voteThread(-1)}
-              className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-sm
-                         text-slate-600 hover:border-red-300 hover:text-red-600 transition-colors"
+              className="flex items-center gap-1 border-2 border-[var(--line)] bg-[rgba(248,241,220,0.78)] px-3 py-1.5 text-sm
+                         text-[var(--ink-soft)] transition-colors hover:text-[var(--danger)]"
               aria-label="Downvote"
             >
-              ▼
+              Downvote
             </button>
           </div>
 
           {/* A01: Moderator controls — only shown to moderator/admin */}
           {canModerate && (
-            <div className="flex flex-wrap items-center gap-2 border-l border-slate-200 pl-4">
-              <span className="text-xs font-medium text-amber-600">
+            <div className="flex flex-wrap items-center gap-2 border-l-2 border-[rgba(59,44,27,0.24)] pl-4">
+              <span className="text-xs font-medium text-[var(--gold)]">
                 <RoleBadge role={role!} />
               </span>
               <Button
@@ -149,7 +149,7 @@ export function ThreadPage() {
                 size="sm"
                 onClick={handleLock}
               >
-                {thread.isLocked ? '🔓 Unlock' : '🔒 Lock'}
+                {thread.isLocked ? 'Unlock' : 'Lock'}
               </Button>
               <Button
                 variant="secondary"
@@ -158,7 +158,7 @@ export function ThreadPage() {
                   handleFlair(thread.flair === 'answered' ? null : 'answered')
                 }
               >
-                {thread.flair === 'answered' ? 'Unflair' : '✓ Mark Answered'}
+                {thread.flair === 'answered' ? 'Unflair' : 'Mark Answered'}
               </Button>
               <Button variant="danger" size="sm" onClick={handleDelete}>
                 Delete Post
@@ -183,8 +183,8 @@ export function ThreadPage() {
       )}
 
       {thread.isLocked && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center text-sm text-slate-500">
-          🔒 This thread is locked. No new replies can be posted.
+        <div className="border-2 border-[var(--line)] bg-[rgba(240,227,194,0.8)] p-4 text-center text-sm text-[var(--ink-soft)]">
+          This thread is locked. No new replies can be posted.
         </div>
       )}
 

@@ -52,24 +52,24 @@ function CommentNode({
 
   return (
     <div
-      className={`flex gap-3 ${depth > 0 ? 'border-l-2 border-slate-100 pl-4' : ''}`}
+      className={`flex gap-3 ${depth > 0 ? 'border-l-2 border-[rgba(59,44,27,0.18)] pl-4' : ''}`}
     >
       {/* Avatar placeholder */}
-      <div className="mt-1 h-7 w-7 flex-shrink-0 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-semibold text-indigo-600">
+      <div className="retro-avatar mt-1 flex h-7 w-7 flex-shrink-0 items-center justify-center text-xs font-semibold">
         {comment.authorName[0]?.toUpperCase() ?? '?'}
       </div>
 
       <div className="flex-1 min-w-0">
         {/* Header */}
-        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <span className="font-semibold text-slate-800">{comment.authorName}</span>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--ink-soft)]">
+          <span className="font-semibold text-[var(--line)]">{comment.authorName}</span>
           <span>·</span>
           <span>{formatDistanceToNow(comment.createdAt)}</span>
         </div>
 
         {/* Body — A03 XSS: sanitized before DOM insertion */}
         <div
-          className="prose prose-sm mt-1 max-w-none text-slate-700"
+          className="retro-prose mt-1 max-w-none text-sm"
           // A03 XSS: ALL user content is passed through DOMPurify sanitizer.
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.content) }}
         />
@@ -79,26 +79,26 @@ function CommentNode({
           {/* Upvote */}
           <button
             onClick={() => onVote(comment.id, comment.upvotes > 0 ? 0 : 1)}
-            className="flex items-center gap-1 text-slate-500 hover:text-indigo-600 transition-colors"
+            className="flex items-center gap-1 text-[var(--ink-soft)] transition-colors hover:text-[var(--accent)]"
             aria-label="Upvote comment"
           >
-            ▲ {comment.upvotes}
+            Upvote {comment.upvotes}
           </button>
 
           {/* Downvote */}
           <button
             onClick={() => onVote(comment.id, comment.downvotes > 0 ? 0 : -1)}
-            className="flex items-center gap-1 text-slate-500 hover:text-red-500 transition-colors"
+            className="flex items-center gap-1 text-[var(--ink-soft)] transition-colors hover:text-[var(--danger)]"
             aria-label="Downvote comment"
           >
-            ▼ {comment.downvotes}
+            Downvote {comment.downvotes}
           </button>
 
           {/* Reply */}
           {canReply && (
             <button
               onClick={() => setShowReply((s) => !s)}
-              className="text-slate-500 hover:text-indigo-600 transition-colors"
+              className="text-[var(--ink-soft)] transition-colors hover:text-[var(--accent)]"
             >
               {showReply ? 'Cancel' : 'Reply'}
             </button>
@@ -109,7 +109,7 @@ function CommentNode({
           {canModerate && (
             <button
               onClick={() => onDelete(comment.id)}
-              className="text-slate-400 hover:text-red-600 transition-colors"
+              className="text-[rgba(109,90,68,0.7)] transition-colors hover:text-[var(--danger)]"
             >
               Delete
             </button>
@@ -152,7 +152,7 @@ function CommentNode({
                   ))}
                 <button
                   onClick={() => setShowChildren((s) => !s)}
-                  className="text-xs text-indigo-600 hover:underline"
+                  className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent)] hover:underline"
                 >
                   {showChildren
                     ? 'Collapse replies'
@@ -202,7 +202,7 @@ export function CommentTree({
 }: CommentTreeProps) {
   if (comments.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-slate-400">
+      <p className="py-8 text-center text-sm text-[var(--ink-soft)]">
         No comments yet. Be the first to reply!
       </p>
     );
