@@ -30,6 +30,13 @@ Admin: admin@usm.edu / Password123!
 
 Student: student@usm.edu / Password123!
 
+### Security & QA Testing
+To verify the automated protections for **Password Hashing (A02)** and **Account Lockout (A07)**, run the test suite from the backend directory:
+
+```bash
+cd backend
+go test ./internal/security -v
+
 To stop the stack:
 
 ```bash
