@@ -37,7 +37,11 @@ export function ReplyBox({ threadId, parentId, onPosted }: ReplyBoxProps) {
     setError('');
     try {
       await postsService.createComment({ threadId, parentId, content });
-      await clearDraft();
+      try {
+        await clearDraft();
+      } catch (draftError) {
+        console.error('[ReplyBox] Failed to clear draft after posting:', draftError);
+      }
       onPosted();
     } catch (err: unknown) {
       const msg =

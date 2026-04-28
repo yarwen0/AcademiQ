@@ -1,25 +1,28 @@
 # Backend
 
+## Docker Compose
+
+From the repo root:
+
+```bash
+docker compose up --build
+```
+
+The backend will run on `http://localhost:8080` and connect to the Compose-managed PostgreSQL container automatically.
+
 ## Run
-1. `cp .env.example .env` and set `JWT_SECRET`/`DATABASE_URL`
-2. `go mod tidy` (downloads deps and updates `go.sum`)
-3. Ensure PostgreSQL is running and the DB in `.env` exists
-4. `go run ./cmd/api`
+1. Start PostgreSQL and create a database, for example `academiq`.
+2. Export env vars:
+   `DATABASE_URL=postgres://postgres:postgres@localhost:5432/academiq?sslmode=disable`
+   `JWT_SECRET=change-me`
+   `FRONTEND_ORIGIN=http://localhost:5173`
+3. `go run ./cmd/api`
 
-Startup automatically:
-- opens PostgreSQL,
-- applies SQL migrations from `migrations/*.sql`,
-- seeds demo users (idempotent),
-- starts the API on `APP_ADDR`.
-
-## Demo Accounts
+The server applies its schema on startup and seeds these demo accounts if they do not exist:
 - `student@academiq.local` / `StudentPass123!`
 - `admin@academiq.local` / `AdminPass123!`
 
-## Security Controls in Code
-- Security headers + CSP: `internal/middleware/security_headers.go`
-- Auth + role checks: `internal/middleware/authz.go`
-- Password hashing: `internal/security/password.go`
-- Brute-force lockout: `internal/security/login_guard.go`
-- Query sanitization + parameterized DB access: `internal/store/user_store.go`
-- Schema/migrations/indexing: `migrations/*.sql`
+## Notes
+- API routes are under `/api/...` and are aligned with the React frontend.
+- Access tokens are returned in JSON; refresh tokens are stored in an `HttpOnly` cookie.
+- Drafts are not stored here. Post and comment drafts stay in the frontend’s local SQLite database.

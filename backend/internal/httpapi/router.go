@@ -1,42 +1,59 @@
 package httpapi
 
 import (
-	"database/sql"
 	"net/http"
 
 	"academiq/backend/internal/auth"
 	"academiq/backend/internal/config"
 	"academiq/backend/internal/middleware"
-	"academiq/backend/internal/security"
 	"academiq/backend/internal/store"
 )
 
 type Server struct {
-	tokens     *auth.TokenManager
-	users      store.UserStore
-	loginGuard *security.LoginGuard
+	cfg    config.Config
+	tokens *auth.TokenManager
+	store  *store.Store
 }
 
-func NewServer(cfg config.Config, db *sql.DB) http.Handler {
+func NewServer(cfg config.Config, db *store.Store) http.Handler {
 	s := &Server{
-		tokens:     auth.NewTokenManager(cfg.JWTSecret, cfg.JWTIssuer, cfg.AccessTTLMinutes, cfg.RefreshTTLHours),
-		users:      store.NewPostgresUserStore(db),
-		loginGuard: security.NewLoginGuard(cfg.LoginLockoutAfter, loginGuardWindow()),
+		cfg:    cfg,
+		tokens: auth.NewTokenManager(cfg.JWTSecret, cfg.JWTIssuer, cfg.AccessTTLMinutes, cfg.RefreshTTLHours),
+		store:  db,
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", s.handleHealth)
-	mux.HandleFunc("POST /auth/login", s.handleLogin)
+
 	mux.HandleFunc("POST /api/auth/login", s.handleLogin)
-	mux.Handle("GET /api/auth/me", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleMe)))
+	mux.HandleFunc("POST /api/auth/register", s.handleRegister)
+	mux.HandleFunc("POST /api/auth/refresh", s.handleRefresh)
 	mux.HandleFunc("POST /api/auth/logout", s.handleLogout)
+	mux.Handle("GET /api/auth/me", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleMe)))
 
-	studentRoute := middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleStudentOnly))
-	mux.Handle("GET /api/student", studentRoute)
+	mux.HandleFunc("GET /api/threads", s.handleListThreads)
+	mux.Handle("POST /api/threads", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleCreateThread)))
+	mux.HandleFunc("GET /api/threads/{id}", s.handleGetThread)
+	mux.Handle("DELETE /api/threads/{id}", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleDeleteThread)))
+	mux.Handle("PATCH /api/threads/{id}/lock", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleToggleThreadLock)))
+	mux.Handle("PATCH /api/threads/{id}/flair", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleSetThreadFlair)))
+	mux.Handle("POST /api/threads/{id}/vote", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleVoteThread)))
+	mux.HandleFunc("GET /api/threads/{id}/comments", s.handleListComments)
 
-	adminRoute := middleware.RequireAuth(s.tokens,
-		middleware.RequireRole("admin", http.HandlerFunc(s.handleAdminOnly)))
-	mux.Handle("GET /api/admin", adminRoute)
+	mux.Handle("POST /api/comments", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleCreateComment)))
+	mux.Handle("DELETE /api/comments/{id}", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleDeleteComment)))
+	mux.Handle("POST /api/comments/{id}/vote", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleVoteComment)))
 
-	return middleware.SecurityHeaders(mux)
+	mux.HandleFunc("GET /api/users/{id}", s.handleGetProfile)
+	mux.Handle("PATCH /api/users/me", middleware.RequireAuth(s.tokens, http.HandlerFunc(s.handleUpdateProfile)))
+
+	admin := middleware.RequireAuth(s.tokens, middleware.RequireRole("admin", http.HandlerFunc(s.handleListUsers)))
+	mux.Handle("GET /api/admin/users", admin)
+	mux.Handle("PATCH /api/admin/users/{id}/role", middleware.RequireAuth(s.tokens, middleware.RequireRole("admin", http.HandlerFunc(s.handleSetUserRole))))
+	mux.Handle("PATCH /api/admin/users/{id}/ban", middleware.RequireAuth(s.tokens, middleware.RequireRole("admin", http.HandlerFunc(s.handleBanUser))))
+	mux.Handle("PATCH /api/admin/users/{id}/unban", middleware.RequireAuth(s.tokens, middleware.RequireRole("admin", http.HandlerFunc(s.handleUnbanUser))))
+	mux.Handle("GET /api/admin/flagged", middleware.RequireAuth(s.tokens, middleware.RequireRole("admin", http.HandlerFunc(s.handleListFlagged))))
+	mux.Handle("DELETE /api/admin/flagged/{id}", middleware.RequireAuth(s.tokens, middleware.RequireRole("admin", http.HandlerFunc(s.handleDismissFlag))))
+
+	return middleware.CORS(cfg.FrontendOrigin, middleware.SecurityHeaders(mux))
 }

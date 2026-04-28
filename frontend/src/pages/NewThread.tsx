@@ -51,7 +51,11 @@ export function NewThreadPage() {
     setServerError('');
     try {
       const thread = await threadsService.create({ title, content, category, tags });
-      await clearDraft();
+      try {
+        await clearDraft();
+      } catch (draftError) {
+        console.error('[NewThreadPage] Failed to clear draft after publish:', draftError);
+      }
       navigate(`/thread/${thread.id}`);
     } catch (err: unknown) {
       const message = (err as { response?: { data?: { message?: string } } })

@@ -8,26 +8,36 @@ import (
 
 	"academiq/backend/internal/config"
 	"academiq/backend/internal/httpapi"
+	"academiq/backend/internal/security"
 	"academiq/backend/internal/store"
 )
 
 func main() {
 	cfg := config.MustLoad()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	db, err := store.OpenPostgres(ctx, cfg.DBURL)
+	db, err := store.OpenPostgres(cfg.DatabaseURL)
 	if err != nil {
-		log.Fatalf("open postgres: %v", err)
+		log.Fatal(err)
 	}
 	defer db.Close()
 
-	if err := store.ApplyMigrations(ctx, db, "migrations"); err != nil {
-		log.Fatalf("migrations failed: %v", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := db.Migrate(ctx); err != nil {
+		log.Fatal(err)
 	}
-	if err := store.SeedDemoUsers(ctx, db); err != nil {
-		log.Fatalf("seed users failed: %v", err)
+
+	studentHash, err := security.HashPassword("StudentPass123!")
+	if err != nil {
+		log.Fatal(err)
+	}
+	adminHash, err := security.HashPassword("AdminPass123!")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.SeedDemoUsers(ctx, studentHash, adminHash); err != nil {
+		log.Fatal(err)
 	}
 
 	h := httpapi.NewServer(cfg, db)
