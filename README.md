@@ -251,10 +251,7 @@ VITE_API_BASE_URL=http://localhost:8080
 -  Input validation and error handling
 
 ---
-
-## Work Distribution (Implemented)
-
-### Kshitiz Neupane — Database Architect
+### Database Architect
 
 Delivered PostgreSQL implementation for the backend:
 
