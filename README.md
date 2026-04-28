@@ -15,7 +15,9 @@ A modern discussion and thread management platform with a Go backend API and Rea
 ### Docker Compose
 
 ```bash
-docker compose up --build
+1. Setup Env: cp .env.example .env
+
+2. Run: docker compose up --build
 ```
 
 This starts:
