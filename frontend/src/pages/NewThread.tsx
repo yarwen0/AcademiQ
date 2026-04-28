@@ -154,23 +154,29 @@ export function NewThreadPage() {
             <label htmlFor="content" className="text-sm font-medium text-slate-700">
               Content
             </label>
+          </div>
+          <div className="relative">
+            <textarea
+              id="content"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Write your post here..."
+              rows={12}
+              className={[
+                'min-h-28 w-full resize-y border-2 px-3 py-2.5 text-sm',
+                'text-[var(--ink)] placeholder:text-[rgba(109,90,68,0.75)] focus:outline-none',
+                errors.content
+                  ? 'border-[var(--danger)] bg-[#fbebe6]'
+                  : 'border-[var(--line)] bg-[rgba(255,252,242,0.92)]',
+              ].join(' ')}
+              aria-describedby={errors.content ? 'content-error' : undefined}
+            />
             {draftSaved && (
-              <span className="text-xs text-slate-400">Draft saved</span>
+              <span className="absolute bottom-2 right-2 bg-[rgba(248,241,220,0.96)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--ink-soft)]">
+                Draft saved
+              </span>
             )}
           </div>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Write your post here..."
-            rows={12}
-            className={[
-              'w-full resize-y rounded-lg border px-3 py-2 text-sm text-slate-800',
-              'placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500',
-              errors.content ? 'border-red-400 bg-red-50' : 'border-slate-300',
-            ].join(' ')}
-            aria-describedby={errors.content ? 'content-error' : undefined}
-          />
           {errors.content && (
             <p id="content-error" role="alert" className="text-xs text-red-600">
               {errors.content}

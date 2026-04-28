@@ -59,25 +59,32 @@ export function AdminPage() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-800">Admin Dashboard</h1>
-        <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-          Admin only
-        </span>
+    <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="retro-shell mb-6 p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
+            <p className="retro-kicker">Control Room</p>
+            <h1 className="retro-title text-3xl font-bold">Admin Dashboard</h1>
+            <p className="max-w-2xl text-sm text-[var(--ink-soft)]">
+              Moderate users, review flagged content, and keep the forum orderly.
+            </p>
+          </div>
+          <span className="border-2 border-[var(--line)] bg-[#e0b4a8] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[#6b2317]">
+            Admin Only
+          </span>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="mb-6 flex gap-0.5 rounded-xl border border-slate-200 bg-slate-50 p-1 w-fit">
+      <div className="mb-6 flex w-fit flex-wrap gap-2">
         {(['users', 'flagged'] as AdminTab[]).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={[
-              'rounded-lg px-4 py-2 text-sm font-medium capitalize transition-colors',
+              'border-2 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] transition',
               activeTab === tab
-                ? 'bg-white text-indigo-600 shadow-sm'
-                : 'text-slate-500 hover:text-slate-800',
+                ? 'border-[var(--line)] bg-[var(--accent)] text-[var(--panel)] shadow-[3px_3px_0_rgba(59,44,27,0.18)]'
+                : 'border-[var(--line)] bg-[var(--panel)] text-[var(--ink-soft)] shadow-[3px_3px_0_rgba(59,44,27,0.12)] hover:bg-[var(--paper-strong)] hover:text-[var(--ink)]',
             ].join(' ')}
           >
             {tab === 'users' ? 'User Management' : 'Flagged Content'}
@@ -86,42 +93,48 @@ export function AdminPage() {
       </div>
 
       {error && (
-        <div role="alert" className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div
+          role="alert"
+          className="mb-4 border-2 border-[var(--danger)] bg-[#fbebe6] p-3 text-sm text-[var(--danger)]"
+        >
           {error}
         </div>
       )}
 
       {isLoading ? (
         <div className="flex justify-center py-16">
-          <span className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+          <span className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
         </div>
       ) : activeTab === 'users' ? (
         /* ---- User Management ---- */
-        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+        <div className="retro-card overflow-hidden">
+          <div className="border-b-2 border-[rgba(59,44,27,0.24)] bg-[rgba(240,227,194,0.82)] px-4 py-3">
+            <p className="retro-kicker">User Registry</p>
+          </div>
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200">
+            <thead className="border-b-2 border-[rgba(59,44,27,0.24)] bg-[rgba(255,252,242,0.55)]">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">User</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Role</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Status</th>
-                <th className="px-4 py-3 text-left font-semibold text-slate-600">Actions</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">User</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Role</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Status</th>
+                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[rgba(59,44,27,0.14)]">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-50">
+                <tr key={u.id} className="bg-[rgba(248,241,220,0.78)] hover:bg-[rgba(255,252,242,0.95)]">
                   <td className="px-4 py-3">
-                    <div className="font-medium text-slate-800">{u.displayName}</div>
-                    <div className="text-xs text-slate-500">{u.email}</div>
+                    <div className="font-semibold text-[var(--line)]">{u.displayName}</div>
+                    <div className="text-xs text-[var(--ink-soft)]">{u.email}</div>
                   </td>
                   <td className="px-4 py-3">
                     <RoleBadge role={u.role} />
                   </td>
                   <td className="px-4 py-3">
                     {u.isBanned ? (
-                      <span className="text-red-600 font-medium">Banned</span>
+                      <span className="font-semibold uppercase tracking-[0.12em] text-[var(--danger)]">Banned</span>
                     ) : (
-                      <span className="text-green-600 font-medium">Active</span>
+                      <span className="font-semibold uppercase tracking-[0.12em] text-[var(--olive)]">Active</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -180,32 +193,32 @@ export function AdminPage() {
             </tbody>
           </table>
           {users.length === 0 && (
-            <p className="p-8 text-center text-sm text-slate-400">No users found.</p>
+            <p className="p-8 text-center text-sm text-[var(--ink-soft)]">No users found.</p>
           )}
         </div>
       ) : (
         /* ---- Flagged Content ---- */
         <div className="space-y-3">
           {flagged.length === 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-400">
-              No flagged content. 🎉
+            <div className="retro-card p-8 text-center text-sm text-[var(--ink-soft)]">
+              No flagged content.
             </div>
           ) : (
             flagged.map((item) => (
               <div
                 key={item.id}
-                className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                className="retro-card flex items-start justify-between gap-4 p-4"
               >
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
-                    <span className="rounded-full bg-orange-100 px-2 py-0.5 font-medium text-orange-600">
+                  <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-[var(--ink-soft)]">
+                    <span className="border border-[var(--line)] bg-[#ead7ac] px-2 py-0.5 font-semibold uppercase tracking-[0.12em] text-[#6f5316]">
                       {item.type}
                     </span>
                     <span>Reported by {item.reportedBy}</span>
                     <span>·</span>
                     <span>{item.reason}</span>
                   </div>
-                  <p className="text-sm text-slate-700">ID: {item.contentId}</p>
+                  <p className="text-sm text-[var(--ink)]">ID: {item.contentId}</p>
                 </div>
                 <Button
                   size="sm"
