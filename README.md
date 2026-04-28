@@ -7,9 +7,37 @@ A modern discussion and thread management platform with a Go backend API and Rea
 - **Node.js** 18+ and npm
 - **Go** 1.23+
 - **PostgreSQL** 12+ (for database)
+- **Docker Compose** (optional, recommended for one-command startup)
 - **Git** for version control
 
 ## Quick Start (Full Stack)
+
+### Docker Compose
+
+```bash
+docker compose up --build
+```
+
+This starts:
+- `frontend` on `http://localhost:5174`
+- `backend` inside the Compose network behind the frontend proxy
+- `postgres` inside the Compose network for the backend
+
+**Demo Credentials:**
+- Student: `student@academiq.local` / `StudentPass123!`
+- Admin: `admin@academiq.local` / `AdminPass123!`
+
+To stop the stack:
+
+```bash
+docker compose down
+```
+
+To remove the database volume too:
+
+```bash
+docker compose down -v
+```
 
 ### 1. Backend Setup
 
@@ -82,6 +110,19 @@ go build -o academiq-api ./cmd/api
 
 # Run migrations (if not automatic on startup)
 # Managed by the app on initialization
+```
+
+### Docker
+
+```bash
+# Build and start all services
+docker compose up --build
+
+# Rebuild one service
+docker compose build backend
+
+# Stop the stack
+docker compose down
 ```
 
 ### Build Configuration
