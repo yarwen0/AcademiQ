@@ -36,6 +36,7 @@ type ThreadRecord struct {
 	Category     string
 	Tags         []string
 	Upvotes      int
+	Downvotes    int
 	CommentCount int
 	Flair        *string
 	IsLocked     bool
@@ -103,6 +104,7 @@ func (s *Store) Migrate(ctx context.Context) error {
 			category TEXT NOT NULL,
 			tags JSONB NOT NULL DEFAULT '[]'::jsonb,
 			upvotes INTEGER NOT NULL DEFAULT 0,
+			downvotes INTEGER NOT NULL DEFAULT 0,
 			flair TEXT NULL CHECK (flair IN ('answered','pinned') OR flair IS NULL),
 			is_locked BOOLEAN NOT NULL DEFAULT FALSE,
 			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -113,6 +115,7 @@ func (s *Store) Migrate(ctx context.Context) error {
 		ALTER TABLE threads ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'General';
 		ALTER TABLE threads ADD COLUMN IF NOT EXISTS tags JSONB NOT NULL DEFAULT '[]'::jsonb;
 		ALTER TABLE threads ADD COLUMN IF NOT EXISTS upvotes INTEGER NOT NULL DEFAULT 0;
+		ALTER TABLE threads ADD COLUMN IF NOT EXISTS downvotes INTEGER NOT NULL DEFAULT 0;
 		ALTER TABLE threads ADD COLUMN IF NOT EXISTS flair TEXT NULL;
 		ALTER TABLE threads ADD COLUMN IF NOT EXISTS is_locked BOOLEAN NOT NULL DEFAULT FALSE;
 		ALTER TABLE threads ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
@@ -155,6 +158,26 @@ func (s *Store) Migrate(ctx context.Context) error {
 			reason TEXT NOT NULL,
 			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 		);
+	`)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.db.ExecContext(ctx, `
+		UPDATE threads t
+		SET
+			upvotes = COALESCE(v.upvotes, 0),
+			downvotes = COALESCE(v.downvotes, 0),
+			updated_at = NOW()
+		FROM (
+			SELECT
+				thread_id,
+				COUNT(*) FILTER (WHERE value = 1) AS upvotes,
+				COUNT(*) FILTER (WHERE value = -1) AS downvotes
+			FROM thread_votes
+			GROUP BY thread_id
+		) AS v
+		WHERE t.id = v.thread_id
 	`)
 	return err
 }
@@ -301,7 +324,7 @@ func (s *Store) ListThreads(ctx context.Context, sort, search, category string, 
 	orderBy := "t.created_at DESC"
 	switch sort {
 	case "top":
-		orderBy = "t.upvotes DESC, t.created_at DESC"
+		orderBy = "(t.upvotes - t.downvotes) DESC, t.created_at DESC"
 	case "unanswered":
 		orderBy = "comment_count ASC, t.created_at DESC"
 	}
@@ -310,7 +333,7 @@ func (s *Store) ListThreads(ctx context.Context, sort, search, category string, 
 	query := fmt.Sprintf(`
 		SELECT
 			t.id, t.title, t.content, t.author_id, u.display_name, t.category, t.tags,
-			t.upvotes,
+			t.upvotes, t.downvotes,
 			COALESCE(comment_counts.comment_count, 0) AS comment_count,
 			t.flair, t.is_locked, t.created_at, t.updated_at
 		FROM threads t
@@ -346,7 +369,7 @@ func (s *Store) GetThreadByID(ctx context.Context, id string) (ThreadRecord, err
 	row := s.db.QueryRowContext(ctx, `
 		SELECT
 			t.id, t.title, t.content, t.author_id, u.display_name, t.category, t.tags,
-			t.upvotes,
+			t.upvotes, t.downvotes,
 			(SELECT COUNT(*) FROM comments c WHERE c.thread_id = t.id) AS comment_count,
 			t.flair, t.is_locked, t.created_at, t.updated_at
 		FROM threads t
@@ -426,16 +449,16 @@ func (s *Store) SetThreadFlair(ctx context.Context, id string, flair *string) (T
 	return s.GetThreadByID(ctx, id)
 }
 
-func (s *Store) VoteThread(ctx context.Context, threadID, userID string, value int) (int, error) {
+func (s *Store) VoteThread(ctx context.Context, threadID, userID string, value int) (int, int, error) {
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, err
+		return 0, 0, err
 	}
 	defer tx.Rollback()
 
 	if value == 0 {
 		if _, err := tx.ExecContext(ctx, `DELETE FROM thread_votes WHERE thread_id = $1 AND user_id = $2`, threadID, userID); err != nil {
-			return 0, err
+			return 0, 0, err
 		}
 	} else {
 		if _, err := tx.ExecContext(ctx, `
@@ -443,25 +466,29 @@ func (s *Store) VoteThread(ctx context.Context, threadID, userID string, value i
 			VALUES ($1, $2, $3)
 			ON CONFLICT (thread_id, user_id) DO UPDATE SET value = EXCLUDED.value
 		`, threadID, userID, value); err != nil {
-			return 0, err
+			return 0, 0, err
 		}
 	}
 
-	var upvotes int
+	var upvotes, downvotes int
 	if err := tx.QueryRowContext(ctx, `
-		SELECT COALESCE(SUM(value), 0) FROM thread_votes WHERE thread_id = $1
-	`, threadID).Scan(&upvotes); err != nil {
-		return 0, err
+		SELECT
+			COUNT(*) FILTER (WHERE value = 1),
+			COUNT(*) FILTER (WHERE value = -1)
+		FROM thread_votes
+		WHERE thread_id = $1
+	`, threadID).Scan(&upvotes, &downvotes); err != nil {
+		return 0, 0, err
 	}
 	if _, err := tx.ExecContext(ctx, `
-		UPDATE threads SET upvotes = $2, updated_at = NOW() WHERE id = $1
-	`, threadID, upvotes); err != nil {
-		return 0, err
+		UPDATE threads SET upvotes = $2, downvotes = $3, updated_at = NOW() WHERE id = $1
+	`, threadID, upvotes, downvotes); err != nil {
+		return 0, 0, err
 	}
 	if err := tx.Commit(); err != nil {
-		return 0, err
+		return 0, 0, err
 	}
-	return upvotes, nil
+	return upvotes, downvotes, nil
 }
 
 func (s *Store) ListCommentsByThread(ctx context.Context, threadID string) ([]CommentRecord, error) {
@@ -675,6 +702,7 @@ func scanThread(scanner threadScanner) (ThreadRecord, error) {
 		&thread.Category,
 		&tagJSON,
 		&thread.Upvotes,
+		&thread.Downvotes,
 		&thread.CommentCount,
 		&flair,
 		&thread.IsLocked,

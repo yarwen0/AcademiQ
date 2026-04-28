@@ -96,6 +96,7 @@ type threadResponse struct {
 	Category     string    `json:"category"`
 	Tags         []string  `json:"tags"`
 	Upvotes      int       `json:"upvotes"`
+	Downvotes    int       `json:"downvotes"`
 	CommentCount int       `json:"commentCount"`
 	Flair        *string   `json:"flair"`
 	IsLocked     bool      `json:"isLocked"`
@@ -367,12 +368,12 @@ func (s *Server) handleVoteThread(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "Invalid request body.", "BAD_REQUEST")
 		return
 	}
-	upvotes, err := s.store.VoteThread(r.Context(), r.PathValue("id"), user.ID, req.Value)
+	upvotes, downvotes, err := s.store.VoteThread(r.Context(), r.PathValue("id"), user.ID, req.Value)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Failed to vote.", "SERVER_ERROR")
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]int{"upvotes": upvotes})
+	writeJSON(w, http.StatusOK, map[string]int{"upvotes": upvotes, "downvotes": downvotes})
 }
 
 func (s *Server) handleListComments(w http.ResponseWriter, r *http.Request) {
@@ -597,6 +598,7 @@ func toThreadResponse(thread store.ThreadRecord) threadResponse {
 		Category:     thread.Category,
 		Tags:         thread.Tags,
 		Upvotes:      thread.Upvotes,
+		Downvotes:    thread.Downvotes,
 		CommentCount: thread.CommentCount,
 		Flair:        thread.Flair,
 		IsLocked:     thread.IsLocked,
