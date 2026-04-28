@@ -15,12 +15,14 @@
  *     not at storage time. Raw content is stored and sanitized on display.
  */
 
-import initSqlJs, { type Database, type SqlJsStatic } from 'sql.js';
+import * as sqlModule from 'sql.js';
+const initSqlJs = sqlModule.default;
+import { type Database, type SqlJsStatic } from 'sql.js';
+import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 
 const IDB_DB_NAME = 'academiq_drafts';
 const IDB_STORE_NAME = 'sqlite_db';
 const IDB_KEY = 'db_bytes';
-const SQLITE_WASM_URL = 'https://sql.js.org/dist/sql-wasm.wasm';
 
 let _SQL: SqlJsStatic | null = null;
 let _db: Database | null = null;
@@ -28,7 +30,7 @@ let _db: Database | null = null;
 // ---- Initialise sql.js ----
 async function getSql(): Promise<SqlJsStatic> {
   if (_SQL) return _SQL;
-  _SQL = await initSqlJs({ locateFile: () => SQLITE_WASM_URL });
+  _SQL = await initSqlJs({ locateFile: () => sqlWasmUrl });
   return _SQL;
 }
 

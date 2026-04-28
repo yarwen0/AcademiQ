@@ -21,7 +21,9 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
+// In local development we prefer same-origin `/api/...` requests via the Vite dev proxy.
+// This avoids CORS/cookie issues and keeps the browser/frontend integration simple.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
 
 // ---- Singleton accessor ----
 // We cannot import AuthContext here (circular dep risk), so we use setter functions

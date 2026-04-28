@@ -9,6 +9,8 @@ import (
 type Config struct {
 	Addr              string
 	Env               string
+	DatabaseURL       string
+	FrontendOrigin    string
 	JWTSecret         string
 	JWTIssuer         string
 	AccessTTLMinutes  int
@@ -20,6 +22,8 @@ func MustLoad() Config {
 	cfg := Config{
 		Addr:              getenv("APP_ADDR", ":8080"),
 		Env:               getenv("APP_ENV", "development"),
+		DatabaseURL:       getenv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/academiq?sslmode=disable"),
+		FrontendOrigin:    getenv("FRONTEND_ORIGIN", "http://localhost:5173"),
 		JWTSecret:         getenv("JWT_SECRET", "dev-secret-change-me"),
 		JWTIssuer:         getenv("JWT_ISSUER", "academiq"),
 		AccessTTLMinutes:  getenvInt("JWT_ACCESS_TTL_MINUTES", 15),

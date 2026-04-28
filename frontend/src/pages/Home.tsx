@@ -16,6 +16,7 @@ import { threadsService } from '../services/threads';
 import { ThreadCard } from '../components/ThreadCard';
 import { Button } from '../components/Button';
 import type { Thread, SortOption } from '../types';
+import type { AxiosError } from 'axios';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'latest', label: 'Latest' },
@@ -54,8 +55,13 @@ export function HomePage() {
           setTotal(res.total);
         }
       })
-      .catch(() => {
-        if (!cancelled) setError('Failed to load threads. Please refresh.');
+      .catch((err: AxiosError<{ message?: string }>) => {
+        if (cancelled) return;
+        if (!err.response) {
+          setError('Cannot reach the backend API. Make sure the Go server and PostgreSQL are running.');
+          return;
+        }
+        setError(err.response.data?.message ?? 'Failed to load threads. Please refresh.');
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);

@@ -1,6 +1,6 @@
 # AcademiQ
 
-A modern discussion and thread management platform with a Go backend API and React TypeScript frontend. Features secure authentication with JWT, role-based access control, community discussions, and admin controls.
+A modern discussion and thread management platform with a Go backend API and React TypeScript frontend. The backend persists application data in PostgreSQL, while the frontend stores unsent post/comment drafts in a browser-local SQLite database powered by `sql.js`.
 
 ## Prerequisites
 
@@ -16,14 +16,12 @@ A modern discussion and thread management platform with a Go backend API and Rea
 ```bash
 cd backend
 
-# Copy environment file and set JWT_SECRET
-cp .env.example .env
-# Edit .env and change JWT_SECRET to a secure value
+# Set backend environment
+export DATABASE_URL=postgres://postgres:postgres@localhost:5432/academiq?sslmode=disable
+export JWT_SECRET=change-me
+export FRONTEND_ORIGIN=http://localhost:5173
 
-# Download dependencies
-go mod tidy
-
-# Run migrations and start server (runs on :8080)
+# Start server (runs on :8080 and applies schema automatically)
 go run ./cmd/api
 ```
 
@@ -211,7 +209,7 @@ AcademiQ/
 - **Comments**: Reply to threads with nested comment support
 - **User Profiles**: View user information and contribution history
 - **Admin Dashboard**: Moderation and system management tools
-- **Draft Management**: Automatic draft saving to LocalStorage
+- **Draft Management**: Automatic draft saving to browser-local SQLite
 
 #### Security
 - **Content Sanitization**: DOMPurify protects against XSS attacks
@@ -249,4 +247,3 @@ VITE_API_BASE_URL=http://localhost:8080
 -  Input validation and error handling
 
 ---
-
