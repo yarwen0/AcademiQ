@@ -1,5 +1,15 @@
 # Backend
 
+## Docker Compose
+
+From the repo root:
+
+```bash
+docker compose up --build
+```
+
+The backend will run on `http://localhost:8080` and connect to the Compose-managed PostgreSQL container automatically.
+
 ## Run
 1. Start PostgreSQL and create a database, for example `academiq`.
 2. Export env vars:

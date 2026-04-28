@@ -29,13 +29,22 @@ export function validateRequired(value: string, fieldName = 'Field'): Validation
 export function validateUniversityEmail(email: string): ValidationResult {
   if (!email) return fail('Email is required.');
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) return fail('Enter a valid email address.');
+  const emailFormatResult = validateEmailFormat(email);
+  if (!emailFormatResult.valid) return emailFormatResult;
 
   const academicTLDs = /\.(edu|ac\.uk|edu\.au|edu\.ca|ac\.nz|ac\.in)$/i;
   if (!academicTLDs.test(email)) {
     return fail('Must be a university email (e.g. name@university.edu).');
   }
+
+  return ok();
+}
+
+export function validateEmailFormat(email: string): ValidationResult {
+  if (!email) return fail('Email is required.');
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return fail('Enter a valid email address.');
 
   return ok();
 }
@@ -122,7 +131,7 @@ export function validateLoginForm(
   email: string,
   password: string,
 ): { valid: boolean; errors: LoginFormErrors } {
-  const emailResult = validateUniversityEmail(email);
+  const emailResult = validateEmailFormat(email);
   const passwordResult = validateRequired(password, 'Password');
 
   return {
