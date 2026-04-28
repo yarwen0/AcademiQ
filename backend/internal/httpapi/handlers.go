@@ -11,6 +11,7 @@ import (
 
 	"academiq/backend/internal/auth"
 	"academiq/backend/internal/middleware"
+	"academiq/backend/internal/moderation"
 	"academiq/backend/internal/security"
 	"academiq/backend/internal/store"
 )
@@ -284,6 +285,12 @@ func (s *Server) handleCreateThread(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "Failed to create post.", "SERVER_ERROR")
 		return
 	}
+	if reason := moderation.DetectFlagReason(req.Title, req.Content); reason != "" {
+		if err := s.store.CreateFlag(r.Context(), "thread", thread.ID, user.ID, reason); err != nil {
+			writeError(w, http.StatusInternalServerError, "Failed to create post.", "SERVER_ERROR")
+			return
+		}
+	}
 	writeJSON(w, http.StatusCreated, toThreadResponse(thread))
 }
 
@@ -414,6 +421,12 @@ func (s *Server) handleCreateComment(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "Failed to post comment.", "SERVER_ERROR")
 		return
+	}
+	if reason := moderation.DetectFlagReason(req.Content); reason != "" {
+		if err := s.store.CreateFlag(r.Context(), "comment", comment.ID, user.ID, reason); err != nil {
+			writeError(w, http.StatusInternalServerError, "Failed to post comment.", "SERVER_ERROR")
+			return
+		}
 	}
 	writeJSON(w, http.StatusCreated, toCommentResponse(comment))
 }

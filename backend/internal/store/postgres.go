@@ -158,6 +158,11 @@ func (s *Store) Migrate(ctx context.Context) error {
 			reason TEXT NOT NULL,
 			created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 		);
+
+		ALTER TABLE flagged_content ADD COLUMN IF NOT EXISTS content_id TEXT NOT NULL DEFAULT '';
+		ALTER TABLE flagged_content ADD COLUMN IF NOT EXISTS reported_by TEXT NOT NULL DEFAULT '';
+		ALTER TABLE flagged_content ADD COLUMN IF NOT EXISTS reason TEXT NOT NULL DEFAULT '';
+		ALTER TABLE flagged_content ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 	`)
 	if err != nil {
 		return err
@@ -631,11 +636,30 @@ func (s *Store) VoteComment(ctx context.Context, commentID, userID string, value
 }
 
 func (s *Store) ListFlags(ctx context.Context) ([]map[string]any, error) {
-	rows, err := s.db.QueryContext(ctx, `
+	usesTargetColumns, err := s.flaggedContentUsesTargetColumns(ctx)
+	if err != nil {
+		return nil, err
+	}
+	query := `
 		SELECT id, type, content_id, reported_by, reason, created_at
 		FROM flagged_content
 		ORDER BY created_at DESC
-	`)
+	`
+	if usesTargetColumns {
+		query = `
+			SELECT
+				id::text,
+				target_type,
+				target_id::text,
+				reported_by::text,
+				reason,
+				created_at
+			FROM flagged_content
+			ORDER BY created_at DESC
+		`
+	}
+
+	rows, err := s.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}

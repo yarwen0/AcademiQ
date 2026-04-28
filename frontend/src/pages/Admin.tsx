@@ -35,7 +35,12 @@ export function AdminPage() {
         : usersService.getFlaggedContent().then(setFlagged);
 
     loads
-      .catch(() => setError('Failed to load data.'))
+      .catch((err: { response?: { data?: { message?: string } } }) => {
+        setError(err.response?.data?.message ?? 'Failed to load data.');
+        if (activeTab === 'flagged') {
+          setFlagged([]);
+        }
+      })
       .finally(() => setIsLoading(false));
   }, [activeTab]);
 
@@ -92,114 +97,119 @@ export function AdminPage() {
         ))}
       </div>
 
-      {error && (
-        <div
-          role="alert"
-          className="mb-4 border-2 border-[var(--danger)] bg-[#fbebe6] p-3 text-sm text-[var(--danger)]"
-        >
-          {error}
-        </div>
-      )}
-
       {isLoading ? (
         <div className="flex justify-center py-16">
           <span className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent" />
         </div>
       ) : activeTab === 'users' ? (
         /* ---- User Management ---- */
-        <div className="retro-card overflow-hidden">
-          <div className="border-b-2 border-[rgba(59,44,27,0.24)] bg-[rgba(240,227,194,0.82)] px-4 py-3">
-            <p className="retro-kicker">User Registry</p>
-          </div>
-          <table className="w-full text-sm">
-            <thead className="border-b-2 border-[rgba(59,44,27,0.24)] bg-[rgba(255,252,242,0.55)]">
-              <tr>
-                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">User</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Role</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Status</th>
-                <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[rgba(59,44,27,0.14)]">
-              {users.map((u) => (
-                <tr key={u.id} className="bg-[rgba(248,241,220,0.78)] hover:bg-[rgba(255,252,242,0.95)]">
-                  <td className="px-4 py-3">
-                    <div className="font-semibold text-[var(--line)]">{u.displayName}</div>
-                    <div className="text-xs text-[var(--ink-soft)]">{u.email}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <RoleBadge role={u.role} />
-                  </td>
-                  <td className="px-4 py-3">
-                    {u.isBanned ? (
-                      <span className="font-semibold uppercase tracking-[0.12em] text-[var(--danger)]">Banned</span>
-                    ) : (
-                      <span className="font-semibold uppercase tracking-[0.12em] text-[var(--olive)]">Active</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-2">
-                      {/* Promote to moderator */}
-                      {u.role === 'student' && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          isLoading={actionLoading === `promote-${u.id}`}
-                          onClick={() =>
-                            withAction(`promote-${u.id}`, () =>
-                              usersService.setRole(u.id, 'moderator'),
-                            )
-                          }
-                        >
-                          → Moderator
-                        </Button>
-                      )}
-                      {/* Demote */}
-                      {u.role === 'moderator' && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          isLoading={actionLoading === `demote-${u.id}`}
-                          onClick={() =>
-                            withAction(`demote-${u.id}`, () =>
-                              usersService.setRole(u.id, 'student'),
-                            )
-                          }
-                        >
-                          ← Student
-                        </Button>
-                      )}
-                      {/* Ban / Unban */}
-                      {u.role !== 'admin' && (
-                        <Button
-                          size="sm"
-                          variant={u.isBanned ? 'secondary' : 'danger'}
-                          isLoading={actionLoading === `ban-${u.id}`}
-                          onClick={() =>
-                            withAction(`ban-${u.id}`, () =>
-                              u.isBanned
-                                ? usersService.unbanUser(u.id)
-                                : usersService.banUser(u.id),
-                            )
-                          }
-                        >
-                          {u.isBanned ? 'Unban' : 'Ban'}
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {users.length === 0 && (
-            <p className="p-8 text-center text-sm text-[var(--ink-soft)]">No users found.</p>
+        <>
+          {error && (
+            <div
+              role="alert"
+              className="mb-4 border-2 border-[var(--danger)] bg-[#fbebe6] p-3 text-sm text-[var(--danger)]"
+            >
+              {error}
+            </div>
           )}
-        </div>
+          <div className="retro-card overflow-hidden">
+            <div className="border-b-2 border-[rgba(59,44,27,0.24)] bg-[rgba(240,227,194,0.82)] px-4 py-3">
+              <p className="retro-kicker">User Registry</p>
+            </div>
+            <table className="w-full text-sm">
+              <thead className="border-b-2 border-[rgba(59,44,27,0.24)] bg-[rgba(255,252,242,0.55)]">
+                <tr>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">User</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Role</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Status</th>
+                  <th className="px-4 py-3 text-left text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--ink-soft)]">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[rgba(59,44,27,0.14)]">
+                {users.map((u) => (
+                  <tr key={u.id} className="bg-[rgba(248,241,220,0.78)] hover:bg-[rgba(255,252,242,0.95)]">
+                    <td className="px-4 py-3">
+                      <div className="font-semibold text-[var(--line)]">{u.displayName}</div>
+                      <div className="text-xs text-[var(--ink-soft)]">{u.email}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <RoleBadge role={u.role} />
+                    </td>
+                    <td className="px-4 py-3">
+                      {u.isBanned ? (
+                        <span className="font-semibold uppercase tracking-[0.12em] text-[var(--danger)]">Banned</span>
+                      ) : (
+                        <span className="font-semibold uppercase tracking-[0.12em] text-[var(--olive)]">Active</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap gap-2">
+                        {u.role === 'student' && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            isLoading={actionLoading === `promote-${u.id}`}
+                            onClick={() =>
+                              withAction(`promote-${u.id}`, () =>
+                                usersService.setRole(u.id, 'moderator'),
+                              )
+                            }
+                          >
+                            → Moderator
+                          </Button>
+                        )}
+                        {u.role === 'moderator' && (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            isLoading={actionLoading === `demote-${u.id}`}
+                            onClick={() =>
+                              withAction(`demote-${u.id}`, () =>
+                                usersService.setRole(u.id, 'student'),
+                              )
+                            }
+                          >
+                            ← Student
+                          </Button>
+                        )}
+                        {u.role !== 'admin' && (
+                          <Button
+                            size="sm"
+                            variant={u.isBanned ? 'secondary' : 'danger'}
+                            isLoading={actionLoading === `ban-${u.id}`}
+                            onClick={() =>
+                              withAction(`ban-${u.id}`, () =>
+                                u.isBanned
+                                  ? usersService.unbanUser(u.id)
+                                  : usersService.banUser(u.id),
+                              )
+                            }
+                          >
+                            {u.isBanned ? 'Unban' : 'Ban'}
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {users.length === 0 && (
+              <p className="p-8 text-center text-sm text-[var(--ink-soft)]">No users found.</p>
+            )}
+          </div>
+        </>
       ) : (
         /* ---- Flagged Content ---- */
         <div className="space-y-3">
-          {flagged.length === 0 ? (
+          {error ? (
+            <div
+              role="alert"
+              className="border-2 border-[var(--danger)] bg-[#fbebe6] p-4 text-sm text-[var(--danger)]"
+            >
+              {error}
+            </div>
+          ) : flagged.length === 0 ? (
             <div className="retro-card p-8 text-center text-sm text-[var(--ink-soft)]">
               No flagged content.
             </div>
