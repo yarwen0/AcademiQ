@@ -2,24 +2,28 @@ package httpapi
 
 import (
 	"net/http"
+	"time"
 
 	"academiq/backend/internal/auth"
 	"academiq/backend/internal/config"
 	"academiq/backend/internal/middleware"
+	"academiq/backend/internal/security"
 	"academiq/backend/internal/store"
 )
 
 type Server struct {
-	cfg    config.Config
-	tokens *auth.TokenManager
-	store  *store.Store
+	cfg        config.Config
+	tokens     *auth.TokenManager
+	store      *store.Store
+	loginGuard *security.LoginGuard
 }
 
 func NewServer(cfg config.Config, db *store.Store) http.Handler {
 	s := &Server{
-		cfg:    cfg,
-		tokens: auth.NewTokenManager(cfg.JWTSecret, cfg.JWTIssuer, cfg.AccessTTLMinutes, cfg.RefreshTTLHours),
-		store:  db,
+		cfg:        cfg,
+		tokens:     auth.NewTokenManager(cfg.JWTSecret, cfg.JWTIssuer, cfg.AccessTTLMinutes, cfg.RefreshTTLHours),
+		store:      db,
+		loginGuard: security.NewLoginGuard(cfg.LoginLockoutAfter, 15*time.Minute),
 	}
 
 	mux := http.NewServeMux()

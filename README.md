@@ -13,11 +13,9 @@ A modern discussion and thread management platform with a Go backend API and Rea
 ## Quick Start (Full Stack)
 
 ### Docker Compose
-
+Run:
 ```bash
-1. Setup Env: cp .env.example .env
-
-2. Run: docker compose up --build
+docker compose up --build
 ```
 
 This starts:
@@ -26,9 +24,9 @@ This starts:
 - `postgres` inside the Compose network for the backend
 
 **Demo Credentials:**
-Admin: admin@usm.edu / Password123!
+Admin: admin@usm.edu / admin
 
-Student: student@usm.edu / Password123!
+Student: student@usm.edu / student
 
 ### Security & QA Testing
 To verify the automated protections for **Password Hashing (A02)** and **Account Lockout (A07)**, run the test suite from the backend directory:

@@ -168,8 +168,15 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// A07 Identification and Authentication Failures: Check for brute-force lockout
+	if s.loginGuard.IsLocked(req.Email) {
+		writeError(w, http.StatusTooManyRequests, "Too many failed login attempts. Please try again later.", "ACCOUNT_LOCKED")
+		return
+	}
+
 	user, err := s.store.FindUserByEmail(r.Context(), req.Email)
 	if err != nil {
+		s.loginGuard.RegisterFailure(req.Email)
 		writeError(w, http.StatusUnauthorized, "Incorrect email or password.", "INVALID_CREDENTIALS")
 		return
 	}
@@ -178,9 +185,13 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := security.ComparePassword(user.PasswordHash, req.Password); err != nil {
+		s.loginGuard.RegisterFailure(req.Email)
 		writeError(w, http.StatusUnauthorized, "Incorrect email or password.", "INVALID_CREDENTIALS")
 		return
 	}
+
+	// Clear failed attempts on successful login
+	s.loginGuard.RegisterSuccess(req.Email)
 
 	s.issueSession(w, user)
 	writeJSON(w, http.StatusOK, authPayload{

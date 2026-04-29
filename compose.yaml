@@ -18,6 +18,8 @@ services:
       context: ./backend
     ports:
       - "8080:8080"
+    volumes:
+      - ./backend/seed.sql:/app/seed.sql:ro
     environment:
       APP_ENV: production
       APP_ADDR: :8080

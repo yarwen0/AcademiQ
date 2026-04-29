@@ -82,6 +82,11 @@ func (s *Store) Close() error {
 	return s.db.Close()
 }
 
+func (s *Store) ExecRaw(ctx context.Context, sql string) error {
+	_, err := s.db.ExecContext(ctx, sql)
+	return err
+}
+
 func (s *Store) Migrate(ctx context.Context) error {
 	_, err := s.db.ExecContext(ctx, `
 		CREATE TABLE IF NOT EXISTS users (
@@ -665,7 +670,7 @@ func (s *Store) ListFlags(ctx context.Context) ([]map[string]any, error) {
 	}
 	defer rows.Close()
 
-	var flags []map[string]any
+	flags := make([]map[string]any, 0)
 	for rows.Next() {
 		var (
 			id, flagType, contentID, reportedBy, reason string

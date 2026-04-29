@@ -4,11 +4,11 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"academiq/backend/internal/config"
 	"academiq/backend/internal/httpapi"
-	"academiq/backend/internal/security"
 	"academiq/backend/internal/store"
 )
 
@@ -28,16 +28,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	studentHash, err := security.HashPassword("StudentPass123!")
-	if err != nil {
-		log.Fatal(err)
-	}
-	adminHash, err := security.HashPassword("AdminPass123!")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := db.SeedDemoUsers(ctx, studentHash, adminHash); err != nil {
-		log.Fatal(err)
+	// Run seed.sql if it exists
+	if seedSQL, err := os.ReadFile("seed.sql"); err == nil {
+		if err := db.ExecRaw(ctx, string(seedSQL)); err != nil {
+			log.Printf("Warning: seed.sql failed: %v", err)
+		} else {
+			log.Println("Seeded database from seed.sql")
+		}
 	}
 
 	h := httpapi.NewServer(cfg, db)
